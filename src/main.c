@@ -93,7 +93,7 @@ void flashed(int pulses)
 
 void spi0_initialize(void)
 {
-	unsigned long spispeed = 1000000;
+	unsigned long spispeed = 2uL * 1000 * 1000;
 
 	CLOCKS->CLK_PERI_CTRL |= CLOCKS_CLK_PERI_CTRL_ENABLE_Msk;
 	while ((CLOCKS->CLK_PERI_CTRL & CLOCKS_CLK_PERI_CTRL_ENABLE_Msk) == 0)
@@ -112,16 +112,24 @@ void spi0_initialize(void)
 	while ((RESETS->RESET_DONE & RESETS_RESET_DONE_spi0_Msk) == 0)
 		;
 
+	SPI0->SSPCR0 = 0;
+	SPI0->SSPCR1 = 0;
+
 	SPI0->SSPCR0 =
-		(0x00uL << SPI0_SSPCR0_SCR_Pos) |
+		(0x01uL << SPI0_SSPCR0_SPH_Pos) |	// SSPCLKOUT phase
+		(0x01uL << SPI0_SSPCR0_SPO_Pos) |	// SSPCLKOUT polarity,
+		(0x07uL << SPI0_SSPCR0_DSS_Pos) |	// 8 bit
 		0;
 	SPI0->SSPCR1 =
-		(0x00uL << SPI0_SSPCR1_SOD_Pos) |
+		(0x00uL << SPI0_SSPCR1_MS_Pos) |	// 0: master
 		0;
-	const uint_fast32_t divider =  rp20xx_get_clk_peri_freq() / spispeed;
+
+	SPI0->SSPCR1 |= SPI0_SSPCR1_SSE_Msk;
+
+	const uint_fast32_t divider = (rp20xx_get_clk_peri_freq() / spispeed / 2) * 2;
 
 	SPI0->SSPCPSR = (SPI0->SSPCPSR & ~ (SPI0_SSPCPSR_CPSDVSR_Msk)) |
-			(divider << SPI0_SSPCPSR_CPSDVSR_Pos) |
+			((divider << SPI0_SSPCPSR_CPSDVSR_Pos) & SPI0_SSPCPSR_CPSDVSR_Msk) |
 			0;
 
 	HARDWARE_SPI0_INITIALIZE();
