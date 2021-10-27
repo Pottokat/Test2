@@ -188,6 +188,13 @@ void SystemInit(void)
 			0;
 	while (CLOCKS->CLK_REF_SELECTED == 0)
 		;
+	CLOCKS->CLK_SYS_CTRL = (CLOCKS->CLK_SYS_CTRL & ~ (CLOCKS_CLK_SYS_CTRL_SRC_Msk | CLOCKS_CLK_SYS_CTRL_AUXSRC_Msk)) |
+			//(0x03uL << CLOCKS_CLK_SYS_CTRL_AUXSRC_Pos) |	// 0x3 → xosc_clksrc
+			(0x00uL << CLOCKS_CLK_SYS_CTRL_AUXSRC_Pos) |	// 0x0 → clksrc_pll_sys
+			(0x00uL << CLOCKS_CLK_SYS_CTRL_SRC_Pos) |		// 0x1 → clksrc_clk_sys_aux
+			0;
+	while (CLOCKS->CLK_SYS_SELECTED == 0)
+		;
 
 	// First bypass PLL
 	RESETS->RESET |= RESETS_RESET_pll_sys_Msk;
