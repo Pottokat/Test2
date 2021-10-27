@@ -154,6 +154,8 @@ void main(void)
 
 	//spi0_initialize();
 
+	putstrq("Hello!\n");
+	putstrq("Hello2!\n");
 	for (;;)
 	{
 /*

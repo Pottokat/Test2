@@ -12,11 +12,10 @@
 #include "gpio.h"
 #include <stdint.h>
 
-
+// Column in 2.19.2. Function Select
 enum
 {
-	GPIO_AF_0 = 1,
-	GPIO_AF_1,
+	GPIO_AF_1 = 1,
 	GPIO_AF_2,
 	GPIO_AF_3,
 	GPIO_AF_4,
