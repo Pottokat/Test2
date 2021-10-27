@@ -5,14 +5,8 @@
  *      Author: User
  */
 
-
-#include "RP20xx.h"
-
-#include "gpio2.h"
-#include "serial2.h"
+#include "hardware.h"
 #include "board.h"
-#include "clocks.h"
-
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>

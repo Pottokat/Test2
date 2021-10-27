@@ -28,6 +28,7 @@ void SysTick_Handler(void);
 #define PLLUSB_DIV1 3
 #define PLLUSB_DIV2 3
 
+#define LCDMODE_ILI9341	1	/* 320*240 SF-TC240T-9370-T с контроллером ILI9341 - STM32F4DISCO */
 
 #define BOARD_ILI9341_GPIO_MOSI		19
 #define BOARD_ILI9341_GPIO_MISO		16
