@@ -31,8 +31,6 @@ extern "C"
 {
 #endif
 
-    #include "cmsis_compiler.h"
-
     #if defined(RP2040)
         #include "RP2040.h"
     #endif

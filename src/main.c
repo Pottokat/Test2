@@ -10,7 +10,7 @@
 
 #include "gpio2.h"
 #include "serial2.h"
-//#include "board.h"
+#include "board.h"
 #include "clocks.h"
 
 #include <stdio.h>
