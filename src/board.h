@@ -35,4 +35,11 @@ void SysTick_Handler(void);
 		gpio0_pin_initialize(29, GPIO_IO_TYPE_PERIPHERAL, GPIO_NOPULL, GPIO_SPEED_LOW, GPIO_AF_1); /* GPIO 29: UART0 RX */ \
 		} while (0)
 
+// MOSI
+// MISO
+// SCLK
+#define HARDWARE_SPI0_INITIALIZE() do { \
+		} while (0)
+
+
 #endif /* SRC_BOARD_H_ */

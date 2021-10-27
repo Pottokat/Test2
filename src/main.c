@@ -91,6 +91,42 @@ void flashed(int pulses)
 	}
 }
 
+void spi0_initialize(void)
+{
+	unsigned long spispeed = 1000000;
+
+	CLOCKS->CLK_PERI_CTRL |= CLOCKS_CLK_PERI_CTRL_ENABLE_Msk;
+	while ((CLOCKS->CLK_PERI_CTRL & CLOCKS_CLK_PERI_CTRL_ENABLE_Msk) == 0)
+		;
+
+	while ((CLOCKS->ENABLED0 & CLOCKS_ENABLED0_clk_sys_spi0_Msk) == 0)
+		;
+	while ((CLOCKS->ENABLED0 & CLOCKS_ENABLED0_clk_peri_spi0_Msk) == 0)
+		;
+
+//	CLOCKS->WAKE_EN1 |= CLOCKS_WAKE_EN1_clk_sys_spi0_Msk;
+//	CLOCKS->WAKE_EN1 |= CLOCKS_WAKE_EN1_clk_peri_spi0_Msk;
+
+	SET_BIT(RESETS->RESET, RESETS_RESET_spi0_Msk);
+	CLEAR_BIT(RESETS->RESET, RESETS_RESET_spi0_Msk);
+	while ((RESETS->RESET_DONE & RESETS_RESET_DONE_spi0_Msk) == 0)
+		;
+
+	SPI0->SSPCR0 =
+		(0x00uL << SPI0_SSPCR0_SCR_Pos) |
+		0;
+	SPI0->SSPCR1 =
+		(0x00uL << SPI0_SSPCR1_SOD_Pos) |
+		0;
+	const uint_fast32_t divider =  rp20xx_get_clk_peri_freq() / spispeed;
+
+	SPI0->SSPCPSR = (SPI0->SSPCPSR & ~ (SPI0_SSPCPSR_CPSDVSR_Msk)) |
+			(divider << SPI0_SSPCPSR_CPSDVSR_Pos) |
+			0;
+
+	HARDWARE_SPI0_INITIALIZE();
+}
+
 void main(void)
 {
     SystemCoreClockUpdate();
