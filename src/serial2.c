@@ -189,6 +189,7 @@ void hardware_uart2_set_speed(uint_fast32_t baudrate)
 	UART1->UARTFBRD = (UART1->UARTFBRD & ~ (UART0_UARTFBRD_BAUD_DIVFRAC_Msk)) |
 		(fractional << UART0_UARTFBRD_BAUD_DIVFRAC_Pos) |
 		0;
+	UART1->UARTLCR_H = UART1->UARTLCR_H;
 }
 
 void hardware_uart2_tx(void * ctx, uint_fast8_t c)
