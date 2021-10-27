@@ -21,7 +21,7 @@ int dbgchaq(int c)
 {
 	if (c == '\n')
 		dbgchaq('\r');
-	while (hardware_uart1_putchar(c) == 0)
+	while (hardware_uart2_putchar(c) == 0)
 		;
 	return c;
 }
@@ -149,8 +149,8 @@ void main(void)
 	}
 	//SysTick_Config(10000);
 	//flashed(7);
-	hardware_uart1_initialize(1);
-	hardware_uart1_set_speed(115200);
+	hardware_uart2_initialize(1);
+	hardware_uart2_set_speed(115200);
 
 	//spi0_initialize();
 
