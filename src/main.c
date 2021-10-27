@@ -42,12 +42,10 @@ void toggle(void)
 	if (state)
 	{
 		gpio0_pin_set(GPIO_LED);
-		gpio0_pin_set(21);
 	}
 	else
 	{
 		gpio0_pin_clr(GPIO_LED);
-		gpio0_pin_clr(21);
 	}
 }
 
@@ -138,7 +136,6 @@ void spi0_initialize(void)
 void main(void)
 {
     SystemCoreClockUpdate();
-	gpio0_pin_initialize(21, GPIO_IO_TYPE_OUTPUT, GPIO_NOPULL, GPIO_SPEED_LOW, GPIO_AF_NONE);
 	gpio0_pin_initialize(GPIO_LED, GPIO_IO_TYPE_OUTPUT, GPIO_NOPULL, GPIO_SPEED_LOW, GPIO_AF_NONE);
 	//__disable_irq();
 	// Flash green led on GPIO25
@@ -155,11 +152,20 @@ void main(void)
 	hardware_uart1_initialize(1);
 	hardware_uart1_set_speed(115200);
 
+	//spi0_initialize();
+
 	for (;;)
 	{
+/*
+		if ((SPI0->SSPSR && SPI0_SSPSR_TNF_Msk) != 0)
+		{
+			SPI0->SSPDR = 0xF0;
+		}
+		continue;
+*/
 		static int line;
 		char s [132];
-		snprintf(s, 132, "Hello! line = %d, SystemCoreClock=%lu\n", line ++, SystemCoreClock);
+		snprintf(s, 132, "1 Hello! line = %d, SystemCoreClock=%lu, SSPSR=%08lX\n", line ++, SystemCoreClock, SPI0->SSPSR);
 		putstrq(s);
 	}
 }

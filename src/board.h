@@ -28,6 +28,7 @@ void SysTick_Handler(void);
 #define PLLUSB_DIV1 3
 #define PLLUSB_DIV2 3
 
+// See 2.19.2. Function Select
 // GPIO 28: UART0 TX
 // GPIO 29: UART0 RX
 #define HARDWARE_UART0_INITIALIZE() do { \
@@ -35,10 +36,22 @@ void SysTick_Handler(void);
 		gpio0_pin_initialize(29, GPIO_IO_TYPE_PERIPHERAL, GPIO_NOPULL, GPIO_SPEED_LOW, GPIO_AF_1); /* GPIO 29: UART0 RX */ \
 		} while (0)
 
-// MOSI
-// MISO
-// SCLK
+// See 2.19.2. Function Select
+// GPIO 20: UART1 TX
+// GPIO 21: UART1 RX
+#define HARDWARE_UART1_INITIALIZE() do { \
+		gpio0_pin_initialize(20, GPIO_IO_TYPE_PERIPHERAL, GPIO_NOPULL, GPIO_SPEED_LOW, GPIO_AF_1); /* GPIO 20: UART1 TX */ \
+		gpio0_pin_initialize(21, GPIO_IO_TYPE_PERIPHERAL, GPIO_NOPULL, GPIO_SPEED_LOW, GPIO_AF_1); /* GPIO 21: UART1 RX */ \
+		} while (0)
+
+// See 2.19.2. Function Select
+// GPIO 22: SPI0 SCK
+// GPIO 23: SPI0 TX
+// GPIO 24: SPI0 RX
 #define HARDWARE_SPI0_INITIALIZE() do { \
+		gpio0_pin_initialize(22, GPIO_IO_TYPE_PERIPHERAL, GPIO_NOPULL, GPIO_SPEED_LOW, GPIO_AF_0); /* GPIO 22: SPI0 SCK */ \
+		gpio0_pin_initialize(23, GPIO_IO_TYPE_PERIPHERAL, GPIO_NOPULL, GPIO_SPEED_LOW, GPIO_AF_0); /* GPIO 23: SPI0 TX */ \
+		gpio0_pin_initialize(24, GPIO_IO_TYPE_PERIPHERAL, GPIO_NOPULL, GPIO_SPEED_LOW, GPIO_AF_0); /* GPIO 24: SPI0 RX */ \
 		} while (0)
 
 

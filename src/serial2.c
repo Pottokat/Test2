@@ -172,7 +172,7 @@ void hardware_uart2_initialize(uint_fast8_t debug)
 	UART1->UARTCR |= UART0_UARTCR_UARTEN_Msk;
 	(void) UART1->UARTCR;
 
-	HARDWARE_UART0_INITIALIZE();
+	HARDWARE_UART1_INITIALIZE();
 }
 
 void hardware_uart2_set_speed(uint_fast32_t baudrate)
