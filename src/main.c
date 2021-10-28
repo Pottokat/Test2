@@ -30,8 +30,6 @@ void putstrq(const char * s)
 }
 
 
-#define GPIO_LED 25
-
 void toggle(void)
 {
 	static int state;
@@ -203,9 +201,8 @@ void local_delay_ms(int timeMS)
 void main(void)
 {
     SystemCoreClockUpdate();
-	gpio0_pin_initialize(GPIO_LED, GPIO_IO_TYPE_OUTPUT, GPIO_NOPULL, GPIO_SPEED_LOW, GPIO_AF_NONE);
-	//__disable_irq();
 	// Flash green led on GPIO25
+	gpio0_pin_initialize(GPIO_LED, GPIO_IO_TYPE_OUTPUT, GPIO_NOPULL, GPIO_SPEED_LOW, GPIO_AF_NONE);
     if (SystemCoreClock == 0)
 	{
 		flashed(2);

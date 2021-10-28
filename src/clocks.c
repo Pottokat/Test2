@@ -438,4 +438,65 @@ unsigned long rp20xx_get_clk_ref_freq(void)
 	}
 }
 
+void rp20xx_pll_sys_initialize(void)
+{
+	PLL_SYS->PWR = 0x0;
+	while (PLL_SYS->PWR != 0)
+		;
 
+	PLL_SYS->CS |= PLL_SYS_CS_BYPASS_Msk;
+	while ((PLL_SYS->CS & PLL_SYS_CS_BYPASS_Msk) == 0)
+		;
+
+	// Set PLL parameters
+	PLL_SYS->CS = (PLL_SYS->CS & ~ (PLL_SYS_CS_REFDIV_Msk)) |
+			((uint32_t) PLL1_REFDIV << PLL_SYS_CS_REFDIV_Pos) |
+			0;
+	PLL_SYS->FBDIV_INT = (PLL_SYS->FBDIV_INT & ~ (PLL_SYS_FBDIV_INT_FBDIV_INT_Msk))	|
+			((uint32_t) PLL1_MUL << PLL_SYS_FBDIV_INT_FBDIV_INT_Pos) |
+			0;
+	PLL_SYS->PRIM = (PLL_SYS->PRIM & ~ (PLL_SYS_PRIM_POSTDIV1_Msk | PLL_SYS_PRIM_POSTDIV2_Msk)) |
+			((uint32_t) PLL1_DIV1 << PLL_SYS_PRIM_POSTDIV1_Pos) |
+			((uint32_t) PLL1_DIV2 << PLL_SYS_PRIM_POSTDIV2_Pos) |
+			0;
+
+	PLL_SYS->CS &= ~ PLL_SYS_CS_BYPASS_Msk;
+	while ((PLL_SYS->CS & PLL_SYS_CS_BYPASS_Msk) != 0)
+		;
+
+	/* Wait for PLL lock state */
+	while ((PLL_SYS->CS & PLL_SYS_CS_LOCK_Msk) == 0)
+		;
+
+}
+
+void rp20xx_pll_usb_initialize(void)
+{
+	PLL_USB->PWR = 0x0;
+	while (PLL_USB->PWR != 0)
+		;
+	PLL_USB->CS |= PLL_SYS_CS_BYPASS_Msk;
+	while ((PLL_USB->CS & PLL_SYS_CS_BYPASS_Msk) == 0)
+		;
+
+	// Set PLL parameters
+	PLL_USB->CS = (PLL_USB->CS & ~ (PLL_SYS_CS_REFDIV_Msk)) |
+			((uint32_t) PLLUSB_REFDIV << PLL_SYS_CS_REFDIV_Pos) |
+			0;
+	PLL_USB->FBDIV_INT = (PLL_USB->FBDIV_INT & ~ (PLL_SYS_FBDIV_INT_FBDIV_INT_Msk))	|
+			((uint32_t) PLLUSB_MUL << PLL_SYS_FBDIV_INT_FBDIV_INT_Pos) |
+			0;
+	PLL_USB->PRIM = (PLL_USB->PRIM & ~ (PLL_SYS_PRIM_POSTDIV1_Msk | PLL_SYS_PRIM_POSTDIV2_Msk)) |
+			((uint32_t) PLLUSB_DIV1 << PLL_SYS_PRIM_POSTDIV1_Pos) |
+			((uint32_t) PLLUSB_DIV2 << PLL_SYS_PRIM_POSTDIV2_Pos) |
+			0;
+
+	PLL_USB->CS &= ~ PLL_SYS_CS_BYPASS_Msk;
+	while ((PLL_USB->CS & PLL_SYS_CS_BYPASS_Msk) != 0)
+		;
+
+	/* Wait for PLL lock state */
+	while ((PLL_USB->CS & PLL_SYS_CS_LOCK_Msk) == 0)
+		;
+
+}
