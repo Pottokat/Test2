@@ -5,8 +5,7 @@
  *      Author: gena
  */
 
-
-#include "RP20xx.h"
+#include "hardware.h"
 
 #include "gpio2.h"
 #include "serial2.h"
@@ -17,7 +16,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#if 1
+#if WITHUART1HW
 
 // RP2040 has 2 identical instances of a UART peripheral,
 // based on the ARM Primecell UART (PL011) (Revision r1p5).
@@ -128,10 +127,10 @@ uint_fast8_t hardware_uart1_getchar(char * cp) /* приём символа, е�
 	return 0;
 }
 
-#endif /* dddd */
+#endif /* WITHUART1HW */
 
 
-#if 1
+#if WITHUART2HW
 
 // RP2040 has 2 identical instances of a UART peripheral,
 // based on the ARM Primecell UART (PL011) (Revision r1p5).
@@ -242,5 +241,5 @@ uint_fast8_t hardware_uart2_getchar(char * cp) /* приём символа, е�
 	return 0;
 }
 
-#endif /* dddd */
+#endif /* WITHUART2HW */
 

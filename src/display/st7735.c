@@ -828,54 +828,6 @@ display_put_char_small2(uint_fast16_t xpix, uint_fast16_t ypix, uint_fast8_t c, 
 	return st7735_put_char_small(xpix, c);
 }
 
-void display_plot(
-	const PACKEDCOLORMAIN_T * buffer,
-	uint_fast16_t dx,	// Размеры окна в пикселях
-	uint_fast16_t dy,
-	uint_fast16_t xpix,	// начало области рисования
-	uint_fast16_t ypix
-	)
-{
-	const uint_fast16_t adjgx = GXADJ(dx);
-	uint_fast32_t memlen = GXSIZE(dx, dy);	// количество элементов
-	// Передача в индикатор по DMA
-	arm_hardware_flush((uintptr_t) buffer, memlen * sizeof (* buffer));	// количество байтов
-	if (dx != adjgx)
-	{
-		while (dy --)
-		{
-			/* в буфере есть неиспользуемые "хвосты" */
-			st7735_colorbuf(buffer, dx);
-			buffer += adjgx;
-		}
-	}
-	else
-	{
-		st7735_colorbuf(buffer, memlen);
-	}
-}
-
-
-// Координаты в пикселях
-void display_plotfrom(uint_fast16_t x, uint_fast16_t y)
-{
-	st7735_y = y;		/* переход от символьных координат к экранным */
-	st7735_set_addr_column(x);
-}
-
-void display_plotstart(
-	uint_fast16_t dy	// Высота окна в пикселях
-	)
-{
-	st7735_set_strype(dy);
-	st7735_put_char_begin();
-}
-
-void display_plotstop(void)
-{
-	st7735_put_char_end();
-}
-
 #endif /* ! LCDMODE_LTDC */
 
 // MY = Mirror Y-axis (Row address direction parameter), D7 parameter of MADCTL command

@@ -29,6 +29,6 @@ unsigned long rp20xx_get_clk_ref_freq(void);
 unsigned long rp20xx_get_clksrc_clk_ref_aux_freq(void);
 unsigned long rp20xx_get_clk_rtc_freq(void);
 
-
+#define CPU_FREQ (rp20xx_get_clk_sys_freq())
 
 #endif /* SRC_CLOCKS_H_ */

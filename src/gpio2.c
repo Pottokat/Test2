@@ -34,6 +34,13 @@ void gpio0_pin_clr(unsigned gpio_no)
 	MODIFY_REG(* GPIO_CTRL_REG, IO_BANK0_GPIO0_CTRL_OUTOVER_Msk, GPIO_OUTPUT_LOW);
 }
 
+void gpio0_pin_setstate(unsigned gpio_no, uint_fast8_t state)
+{
+	__IOM uint32_t * const GPIO_CTRL_REG = (__IOM uint32_t *) (IO_BANK0_BASE + 0x04 + (0x08 * gpio_no));
+
+	MODIFY_REG(* GPIO_CTRL_REG, IO_BANK0_GPIO0_CTRL_OUTOVER_Msk, state ? GPIO_OUTPUT_HIGH : GPIO_OUTPUT_LOW);
+}
+
 void gpio0_pin_initialize(uint32_t gpio_no, eGPIO_IO_Type io_type, eGPIO_Pull pu_pd, eGPIO_Speed speed, uint32_t alternate_function)
 {
     __IOM uint32_t * const IO_BANK_CTRL_REG = (__IOM uint32_t *)(IO_BANK0_BASE + 0x04 + (0x08 * gpio_no));
