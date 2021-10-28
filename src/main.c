@@ -15,21 +15,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-int dbgchaq(int c)
-{
-	if (c == '\n')
-		dbgchaq('\r');
-	while (hardware_uart2_putchar(c) == 0)
-		;
-	return c;
-}
-void putstrq(const char * s)
-{
-	while (* s)
-		dbgchaq(* s ++);
-}
-
-
 void toggle(void)
 {
 	static int state;
@@ -99,105 +84,154 @@ void board_lcd_reset(uint_fast8_t state)
 	hardware_spi_io_delay();
 }
 
-///////////////////////////
 
-// количество циклов на микросекунду
-static unsigned long
-local_delay_uscycles(unsigned timeUS, unsigned cpufreq_MHz)
-{
-#if CPUSTYLE_AT91SAM7S
-	#warning TODO: calibrate constant	 looks like CPUSTYLE_STM32MP1
-	const unsigned long top = timeUS * 175uL / cpufreq_MHz;
-	//const unsigned long top = 55 * cpufreq_MHz * timeUS / 1000;
-#elif CPUSTYLE_ATSAM3S
-	#warning TODO: calibrate constant looks like CPUSTYLE_STM32MP1
-	const unsigned long top = timeUS * 270uL / cpufreq_MHz;
-	//const unsigned long top = 55 * cpufreq_MHz * timeUS / 1000;
-#elif CPUSTYLE_ATSAM4S
-	#warning TODO: calibrate constant looks like CPUSTYLE_STM32MP1
-	const unsigned long top = timeUS * 270uL / cpufreq_MHz;
-	//const unsigned long top = 55 * cpufreq_MHz * timeUS / 1000;
-#elif CPUSTYLE_STM32F0XX
-	#warning TODO: calibrate constant looks like CPUSTYLE_STM32MP1
-	const unsigned long top = timeUS * 190uL / cpufreq_MHz;
-	//const unsigned long top = 55 * cpufreq_MHz * timeUS / 1000;
-#elif CPUSTYLE_RP20XX
-	const unsigned long top = timeUS * 1480uL / cpufreq_MHz;
-#elif CPUSTYLE_STM32L0XX
-	#warning TODO: calibrate constant looks like CPUSTYLE_STM32MP1
-	const unsigned long top = timeUS * 20uL / cpufreq_MHz;
-	//const unsigned long top = 55 * cpufreq_MHz * timeUS / 1000;
-#elif CPUSTYLE_STM32F1XX
-	#warning TODO: calibrate constant looks like CPUSTYLE_STM32MP1
-	const unsigned long top = timeUS * 345uL / cpufreq_MHz;
-	//const unsigned long top = 55 * cpufreq_MHz * timeUS / 1000;
-#elif CPUSTYLE_STM32F30X
-	#warning TODO: calibrate constant looks like CPUSTYLE_STM32MP1
-	const unsigned long top = timeUS * 430uL / cpufreq_MHz;
-	//const unsigned long top = 55 * cpufreq_MHz * timeUS / 1000;
-#elif CPUSTYLE_STM32F4XX
-	#warning TODO: calibrate constant looks like CPUSTYLE_STM32MP1
-	const unsigned long top = timeUS * 3800uL / cpufreq_MHz;
-#elif CPUSTYLE_STM32F7XX
-	#warning TODO: calibrate constant looks like CPUSTYLE_STM32MP1
-	const unsigned long top = 55uL * cpufreq_MHz * timeUS / 1000;
-#elif CPUSTYLE_STM32H7XX
-	#warning TODO: calibrate constant looks like CPUSTYLE_STM32MP1
-	const unsigned long top = 77uL * cpufreq_MHz * timeUS / 1000;
-#elif CPUSTYLE_R7S721
-	const unsigned long top = 105uL * cpufreq_MHz * timeUS / 1000;
-#elif CPUSTYLE_XC7Z
-	const unsigned long top = 125uL * cpufreq_MHz * timeUS / 1000;
-#elif CPUSTYLE_XCZU
-	const unsigned long top = 125uL * cpufreq_MHz * timeUS / 1000;
-#elif CPUSTYPE_ALLWNV3S
-	#warning TODO: calibrate constant looks like CPUSTYLE_STM32MP1
-	const unsigned long top = 125uL * cpufreq_MHz * timeUS / 1000;
-#elif CPUSTYLE_STM32MP1
-	// калибровано для 800 МГц процессора
-	const unsigned long top = 120uL * cpufreq_MHz * timeUS / 1000;
-#elif CPUSTYPE_TMS320F2833X && 1 // RAM code0
-	#warning TODO: calibrate constant looks like CPUSTYLE_STM32MP1
-	const unsigned long top = timeUS * 760uL / cpufreq_MHz;	// tested @ 100 MHz Execute from RAM
-	//const unsigned long top = 55 * cpufreq_MHz * timeUS / 1000;
-#elif CPUSTYPE_TMS320F2833X	&& 0	// FLASH code
-	#warning TODO: calibrate constant looks like CPUSTYLE_STM32MP1
-	const unsigned long top = 55uL * cpufreq_MHz * timeUS / 1000;
-#else
-	#error TODO: calibrate constant looks like CPUSTYLE_STM32MP1
-	const unsigned long top = 55uL * cpufreq_MHz * timeUS / 1000;
-#endif
-	return top;
-}
-// Атрибут RAMFUNC_NONILINE убран, так как функция
-// используется в инициализации SDRAM на процессорах STM32F746.
-// TODO: перекалибровать для FLASH контроллеров.
-void /* RAMFUNC_NONILINE */ local_delay_us(int timeUS)
-{
-	// Частота процессора приволится к мегагерцам.
-	const unsigned long top = local_delay_uscycles(timeUS, CPU_FREQ / 1000000uL);
-	//
-	volatile unsigned long t;
-	for (t = 0; t < top; ++ t)
-	{
-	}
-}
-// exactly as required
+// Вызовы этой функции (или группу вызовов) требуется "обрамить" парой вызовов
+// display_wrdatabar_begin() и display_wrdatabar_end().
 //
-void local_delay_ms(int timeMS)
+void
+//NOINLINEAT
+display_bar(
+	uint_fast16_t xpix,
+	uint_fast16_t ypix,
+	uint_fast8_t width,	/* количество знакомест, занимаемых индикатором */
+	uint_fast8_t value,		/* значение, которое надо отобразить */
+	uint_fast8_t tracevalue,		/* значение маркера, которое надо отобразить */
+	uint_fast8_t topvalue,	/* значение, соответствующее полностью заполненному индикатору */
+	uint_fast8_t vpattern,	/* DISPLAY_BAR_HALF или DISPLAY_BAR_FULL */
+	uint_fast8_t vpatternmax,	/* DISPLAY_BAR_HALF или DISPLAY_BAR_FULL - для отображения запомненного значения */
+	uint_fast8_t vemptyp			/* паттерн для заполнения между штрихами */
+	)
 {
-	// Частота процессора приволится к мегагерцам.
-	const unsigned long top = local_delay_uscycles(1000, CPU_FREQ / 1000000uL);
-	int n;
-	for (n = 0; n < timeMS; ++ n)
+	//enum { DISPLAY_BAR_LEVELS = 6 };	// количество градаций в одном знакоместе
+
+	//value = value < 0 ? 0 : value;
+	const uint_fast16_t wfull = GRID2X(width);
+	const uint_fast16_t wpart = (uint_fast32_t) wfull * value / topvalue;
+	const uint_fast16_t wmark = (uint_fast32_t) wfull * tracevalue / topvalue;
+	uint_fast8_t i = 0;
+
+	for (; i < wpart; ++ i)
 	{
-		volatile unsigned long t;
-		for (t = 0; t < top; ++ t)
+		if (i == wmark)
 		{
+			xpix = display_barcolumn(xpix, ypix, vpatternmax);
+			continue;
 		}
+#if (DSTYLE_G_X132_Y64 || DSTYLE_G_X128_Y64) && DSTYLE_UR3LMZMOD
+		xpix = display_barcolumn(xpix, ypix, vpattern);
+#elif DSTYLE_G_X64_Y32
+		xpix = display_barcolumn(xpix, ypix, (i % 6) != 5 ? vpattern : vemptyp);
+#else
+		xpix = display_barcolumn(xpix, ypix, (i % 2) == 0 ? vpattern : PATTERN_SPACE);
+#endif
+	}
+
+	for (; i < wfull; ++ i)
+	{
+		if (i == wmark)
+		{
+			xpix = display_barcolumn(xpix, ypix, vpatternmax);
+			continue;
+		}
+#if (DSTYLE_G_X132_Y64 || DSTYLE_G_X128_Y64) && DSTYLE_UR3LMZMOD
+		xpix = display_barcolumn(xpix, ypix, vemptyp);
+#elif DSTYLE_G_X64_Y32
+		xpix = display_barcolumn(xpix, ypix, (i % 6) == 5 ? vpattern : vemptyp);
+#else
+		xpix = display_barcolumn(xpix, ypix, (i % 2) == 0 ? vemptyp : PATTERN_SPACE);
+#endif
 	}
 }
 
+
+// Адресация для s-meter
+static uint_fast8_t
+display_bars_x_rx(
+	uint_fast8_t x,
+	uint_fast8_t xoffs	// grid
+	)
+{
+	return x + xoffs;
+}
+
+// Адресация для swr-meter
+static uint_fast8_t
+display_bars_x_swr(
+	uint_fast8_t x,
+	uint_fast8_t xoffs	// grid
+	)
+{
+	return display_bars_x_rx(x, xoffs);
+}
+
+// Адресация для pwr-meter
+static uint_fast8_t
+display_bars_x_pwr(
+	uint_fast8_t x,
+	uint_fast8_t xoffs	// grid
+	)
+{
+#if WITHSHOWSWRPWR	/* на дисплее одновременно отображаются SWR-meter и PWR-meter */
+	return display_bars_x_rx(x, xoffs + CHARS2GRID(BDTH_ALLSWR + BDTH_SPACESWR));
+#else
+	return display_bars_x_rx(x, xoffs);
+#endif
+}
+
+
+static uint_fast8_t display_mapbar(
+	uint_fast8_t val,
+	uint_fast8_t bottom, uint_fast8_t top,
+	uint_fast8_t mapleft,
+	uint_fast8_t mapinside,
+	uint_fast8_t mapright
+	)
+{
+	if (val < bottom)
+		return mapleft;
+	if (val < top)
+		return mapinside;
+	return mapright;
+}
+
+void display_smeter(
+	uint_fast8_t x,
+	uint_fast8_t y,
+	uint_fast8_t value,		// текущее значение
+	uint_fast8_t tracemax,	// метка запомненного максимума
+	uint_fast8_t level9,	// s9 level
+	uint_fast8_t delta1,	// s9 - s0 delta
+	uint_fast8_t delta2)	// s9+50 - s9 delta
+{
+	tracemax = value > tracemax ? value : tracemax;	// защита от рассогласования значений
+	//delta1 = delta1 > level9 ? level9 : delta1;
+
+	const uint_fast8_t leftmin = level9 - delta1;
+	const uint_fast8_t mapleftval = display_mapbar(value, leftmin, level9, 0, value - leftmin, delta1);
+	const uint_fast8_t mapleftmax = display_mapbar(tracemax, leftmin, level9, delta1, tracemax - leftmin, delta1); // delta1 - invisible
+	const uint_fast8_t maprightval = display_mapbar(value, level9, level9 + delta2, 0, value - level9, delta2);
+	const uint_fast8_t maprightmax = display_mapbar(tracemax, level9, level9 + delta2, delta2, tracemax - level9, delta2); // delta2 - invisible
+
+	colmain_setcolors(LCOLOR, BGCOLOR);
+	uint_fast16_t ypix;
+	uint_fast16_t xpix = display_wrdatabar_begin(display_bars_x_rx(x, CHARS2GRID(0)), y, & ypix);
+	display_bar(xpix, ypix, BDTH_LEFTRX, mapleftval, mapleftmax, delta1, PATTERN_BAR_HALF, PATTERN_BAR_FULL, PATTERN_BAR_EMPTYHALF);		//ниже 9 баллов ничего
+	display_wrdatabar_end();
+	//
+	colmain_setcolors(RCOLOR, BGCOLOR);
+	uint_fast16_t ypix2;
+	uint_fast16_t xpix2 = display_wrdatabar_begin(display_bars_x_rx(x, CHARS2GRID(BDTH_LEFTRX)), y, & ypix2);
+	display_bar(xpix2, ypix2, BDTH_RIGHTRX, maprightval, maprightmax, delta2, PATTERN_BAR_FULL, PATTERN_BAR_FULL, PATTERN_BAR_EMPTYFULL);		// выше 9 баллов ничего нет.
+	display_wrdatabar_end();
+
+	if (BDTH_SPACERX != 0)
+	{
+		uint_fast16_t ypix;
+		uint_fast16_t xpix = display_wrdatabar_begin(display_bars_x_pwr(x, CHARS2GRID(BDTH_ALLRX)), y, & ypix);
+		display_bar(xpix, ypix, BDTH_SPACERX, 0, 1, 1, PATTERN_SPACE, PATTERN_SPACE, PATTERN_SPACE);
+		display_wrdatabar_end();
+	}
+}
 void main(void)
 {
     SystemCoreClockUpdate();
@@ -219,7 +253,7 @@ void main(void)
 	hardware_spi_initialize();
 
 	PRINTF(__DATE__ " " __TIME__ " - Hello!\n");
-	PRINTF("Hello2!\n");
+	PRINTF("Hello2!, SystemCoreClock=%lu\n", (unsigned long) SystemCoreClock);
 
 //	for (;;)
 //	{
@@ -235,6 +269,7 @@ void main(void)
 
 	display_at(0,  0, "Hello!");
 
+
 	// software delays calibration test
 //	gpio0_pin_initialize(26, GPIO_IO_TYPE_OUTPUT, GPIO_NOPULL, GPIO_SPEED_LOW, GPIO_AF_NONE);
 //	for (;;)
@@ -245,12 +280,18 @@ void main(void)
 //		local_delay_ms(20);
 //	}
 
+	int value = 50;
+	display_smeter(0, 2, value, 39, 60, 60, 60);
 	for (;;)
 	{
 		char c;
 		if (dbg_getchar(& c))
 		{
 			dbg_putchar(c);
+
+			// s-meter test
+			value = (value + 5) % 120;
+			display_smeter(0, 2, value, 39, 60, 60, 60);
 		}
 //		static int line;
 //		char s [132];

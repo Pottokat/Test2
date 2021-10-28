@@ -30,6 +30,7 @@ uint_fast16_t display_wrdata_begin(uint_fast8_t xcell, uint_fast8_t ycell, uint_
 uint_fast16_t display_put_char_small(uint_fast16_t xpix, uint_fast16_t ypix, uint_fast8_t c, uint_fast8_t lowhalf);
 void display_wrdata_end(void);
 
+
 /* Индикатор 160*128 с контроллером Sitronix ST7735 */
 /* Индикатор 176*132 с контроллером ILITEK ILI9163 */
 /* Индикатор 320*240 с контроллером ILITEK ILI9341 */
@@ -70,5 +71,6 @@ void display_palette(void);				// Palette reload
 
 void display_at(uint_fast8_t x, uint_fast8_t y, const char * s);
 void display_at_P(uint_fast8_t x, uint_fast8_t y, const char FLASHMEM * s);
+void colmain_setcolors(COLORMAIN_T fg, COLORMAIN_T bg);
 
 #endif /* DISPLAY_H_ */
