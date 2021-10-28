@@ -11,6 +11,7 @@
 #define CPUSTYLE_RP20XX	1
 #define WITHDEBUG 1
 
+#define WITHSPIHW 1
 #define WITHUART2HW 1
 #define WITHDEBUG_USART2 1
 

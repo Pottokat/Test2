@@ -1520,9 +1520,12 @@ void display_hardware_initialize(void)
 #endif /* LCDMODEX_SII9022A */
 
 #if LCDMODE_HARD_SPI
+	DISPLAY_BUS_INITIALIZE();
 
 #elif LCDMODE_HARD_I2C
+	DISPLAY_BUS_INITIALIZE();
 #elif LCDMODE_LTDC
+	DISPLAY_BUS_INITIALIZE();
 #else
 	#if LCDMODE_HD44780 && (LCDMODE_SPI == 0)
 		hd44780_io_initialize();

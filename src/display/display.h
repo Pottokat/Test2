@@ -68,4 +68,7 @@ void display_nextfb(void);				/* переключаем на следующий 
 void display_set_contrast(uint_fast8_t v);
 void display_palette(void);				// Palette reload
 
+void display_at(uint_fast8_t x, uint_fast8_t y, const char * s);
+void display_at_P(uint_fast8_t x, uint_fast8_t y, const char FLASHMEM * s);
+
 #endif /* DISPLAY_H_ */

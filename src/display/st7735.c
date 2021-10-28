@@ -548,6 +548,42 @@ st7735_put_char_half(xholder_t xpix, char cc)
 	return xpix;
 }
 
+
+static unsigned st7735_get_id(void)
+{
+#if WITHSPIEXT16
+
+	uint_fast16_t v;
+
+	hardware_spi_connect_b16(ST7735_SPISPEED, ST7735_SPIMODE);	/* Enable SPI */
+	prog_select(targetlcd);	/* start sending data to target chip */
+	ST7735_CMND();	/* RS: Low: select an index or status register */
+	hardware_spi_b16_p1(ILI9341_CHIPID);	// старшая половина - 0 - 'NOP' command
+	hardware_spi_complete_b16();
+	ST7735_DATA();	/* RS: High: select a control register */
+	v = hardware_spi_b16_p1(0x0000);
+	hardware_spi_complete_b16();
+	prog_unselect(targetlcd);
+	hardware_spi_disconnect();
+
+	return v;
+
+#else /* WITHSPIEXT16 */
+	uint_fast8_t v1, v2;
+	spi_select2(targetlcd, ST7735_SPIMODE, ST7735_SPISPEED);	/* Enable SPI */
+	ST7735_CMND();	/* RS: Low: select an index or status register */
+	spi_progval8_p1(targetlcd, ILI9341_CHIPID); // Column addr set (0..127)
+	spi_complete(targetlcd);
+	ST7735_DATA();	/* RS: High: select a control register */
+	spi_progval8_p1(targetlcd, 0x00);
+	v1 = spi_complete(targetlcd);
+	spi_progval8_p1(targetlcd, 0x00);
+	v2 = spi_complete(targetlcd);
+
+	return v1 * 256 | v2;
+#endif /* WITHSPIEXT16 */
+}
+
 static uint_fast16_t st7735_y;	/* в пикселях */
 
 // открыть для записи полосу высотой с символ и шириной до правого края
@@ -1320,6 +1356,8 @@ void display_initialize(void)
 	#if LCDMODE_LTDC
 		st7735_switchtorgb();	/* Переключение дисплея в режим обновления видеопамяти по параллельному интерфейсу. */
 	#endif
+
+	PRINTF("display_initialize: chipid=%04X\n", st7735_get_id());
 }
 
 void display_set_contrast(uint_fast8_t v)
