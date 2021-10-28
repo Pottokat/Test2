@@ -534,6 +534,7 @@ extern char nameDATAFLASH [];
 void bootloader_readimage(unsigned long flashoffset, uint8_t * dest, unsigned Len);
 
 void hardware_spi_initialize(void);
+void hardware_spi_io_delay(void);
 
 #ifdef __cplusplus
 }

@@ -91,12 +91,14 @@ void board_lcd_rs(uint_fast8_t state)
 {
 	//PRINTF("board_lcd_rs: state=%d\n", state);
 	gpio0_pin_setstate(BOARD_ILI9341_GPIO_CD, state);
+	hardware_spi_io_delay();
 }
 
 void board_lcd_reset(uint_fast8_t state)
 {
 	//PRINTF("board_lcd_reset: state=%d\n", state);
 	gpio0_pin_setstate(BOARD_ILI9341_GPIO_RESET, state);
+	hardware_spi_io_delay();
 }
 
 ///////////////////////////

@@ -9,14 +9,17 @@
 #include "board.h"
 #include "spi.h"
 
-
+void hardware_spi_io_delay(void)
+{
+	local_delay_us(2);
+}
 
 // See ARM PrimeCell Synchronous Serial Port (PL022) Technical Reference Manual
 // DDI0194H_ssp_pl022_trm.pdf
 void hardware_spi_initialize(void)
 {
-	//unsigned long spispeed = 10uL * 1000 * 1000;
-	unsigned long spispeed = 10uL * 1000;
+	unsigned long spispeed = 10uL * 1000 * 1000;
+	//unsigned long spispeed = 100uL * 1000;
 
 	CLOCKS->CLK_PERI_CTRL |= CLOCKS_CLK_PERI_CTRL_ENABLE_Msk;
 	while ((CLOCKS->CLK_PERI_CTRL & CLOCKS_CLK_PERI_CTRL_ENABLE_Msk) == 0)
@@ -100,11 +103,13 @@ void prog_select_impl(
 {
 	//PRINTF("prog_select_impl: state=%d\n", 0);
 	gpio0_pin_setstate(BOARD_ILI9341_GPIO_CSN, 0);
+	hardware_spi_io_delay();
 }
 
 void prog_unselect_impl(void)
 {
 	//PRINTF("prog_unselect_impl: state=%d\n", 1);
 	gpio0_pin_setstate(BOARD_ILI9341_GPIO_CSN, 1);
+	hardware_spi_io_delay();
 }
 
