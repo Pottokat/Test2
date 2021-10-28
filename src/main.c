@@ -231,22 +231,30 @@ void main(void)
 //		spi_complete(targetlcd);
 //		spi_unselect(targetlcd);
 //	}
-
 	display_hardware_initialize();
 	display_reset();
 	display_initialize();
 	display_clear();
 
 	display_at(0,  0, "Hello!");
+
+	// software delays calibration test
+//	gpio0_pin_initialize(26, GPIO_IO_TYPE_OUTPUT, GPIO_NOPULL, GPIO_SPEED_LOW, GPIO_AF_NONE);
+//	for (;;)
+//	{
+//		gpio0_pin_setstate(26, 1);
+//		local_delay_ms(20);
+//		gpio0_pin_setstate(26, 0);
+//		local_delay_ms(20);
+//	}
+
 	for (;;)
 	{
-/*
-		if ((SPI0->SSPSR && SPI0_SSPSR_TNF_Msk) != 0)
+		char c;
+		if (dbg_getchar(& c))
 		{
-			SPI0->SSPDR = 0xF0;
+			dbg_putchar(c);
 		}
-		continue;
-*/
 //		static int line;
 //		char s [132];
 //		snprintf(s, 132, "1 Hello! line = %d, SystemCoreClock=%lu, SSPSR=%08lX\n", line ++, SystemCoreClock, SPI0->SSPSR);
