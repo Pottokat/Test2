@@ -108,4 +108,19 @@ void board_lcd_rs(uint_fast8_t v);	// выставить уровень на с�
 void board_lcd_reset(uint_fast8_t v);	// выставить уровень на сигнале lcd reset
 void board_update(void);
 
+#define PATTERN_SPACE 0x00
+#define PATTERN_BAR_HALF 0xA5
+#define PATTERN_BAR_FULL 0xFF
+#define PATTERN_BAR_EMPTYHALF 0x81
+#define PATTERN_BAR_EMPTYFULL 0x81
+
+#define LCOLOR TFTRGB(0, 255, 0)
+#define RCOLOR TFTRGB(255, 0, 0)
+#define BGCOLOR TFTRGB(9, 0, 0)
+
+#define BDTH_ALLRX 20
+#define BDTH_LEFTRX 10
+#define BDTH_SPACERX 0
+#define BDTH_RIGHTRX 10
+
 #endif /* SRC_BOARD_H_ */
