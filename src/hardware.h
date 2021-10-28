@@ -21,6 +21,8 @@
 #include "serial2.h"
 #include "clocks.h"
 
+//#define FORMATFROMLIBRARY 1
+
 #define FLASHMEM
 #define NOINLINEAT
 #define PSTR(s) s
