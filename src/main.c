@@ -124,7 +124,7 @@ local_delay_uscycles(unsigned timeUS, unsigned cpufreq_MHz)
 	const unsigned long top = timeUS * 190uL / cpufreq_MHz;
 	//const unsigned long top = 55 * cpufreq_MHz * timeUS / 1000;
 #elif CPUSTYLE_RP20XX
-	const unsigned long top = timeUS * 190uL / cpufreq_MHz;
+	const unsigned long top = timeUS * 1480uL / cpufreq_MHz;
 #elif CPUSTYLE_STM32L0XX
 	#warning TODO: calibrate constant looks like CPUSTYLE_STM32MP1
 	const unsigned long top = timeUS * 20uL / cpufreq_MHz;

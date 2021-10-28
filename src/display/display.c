@@ -1478,7 +1478,7 @@ const videomode_t vdmode0 =
 /* вызывается при запрещённых прерываниях. */
 void display_hardware_initialize(void)
 {
-	PRINTF(PSTR("display_hardware_initialize start\n"));
+	//PRINTF(PSTR("display_hardware_initialize start\n"));
 
 
 #if WITHDMA2DHW
@@ -1533,5 +1533,5 @@ void display_hardware_initialize(void)
 		DISPLAY_BUS_INITIALIZE();	// see LCD_CONTROL_INITIALIZE, LCD_DATA_INITIALIZE_WRITE
 	#endif /* LCDMODE_HD44780 && (LCDMODE_SPI == 0) */
 #endif
-	PRINTF(PSTR("display_hardware_initialize done\n"));
+	//PRINTF(PSTR("display_hardware_initialize done\n"));
 }
