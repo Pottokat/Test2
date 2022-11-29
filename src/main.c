@@ -232,6 +232,7 @@ void display_smeter(
 		display_wrdatabar_end();
 	}
 }
+
 void main(void)
 {
     SystemCoreClockUpdate();
